@@ -1,0 +1,8 @@
+To install the pyOptSparse package in a folder on the Python search path (usually in a python site-packages or dist-packages folder) run:
+python3 setup.py install --user
+
+This will install the package to ~/.local which is typically found automatically by Python. 
+
+To reinstall, clear build ( rm -rf build ) and repeat above steps
+
+Note : Set correct CC and CXX flags in setup.py

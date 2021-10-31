@@ -1,6 +1,12 @@
 import sys
 import re
 import setuptools  # magic import to allow us to use entry_point
+import os
+
+os.environ["CC"] = "gcc-11"
+os.environ["CXX"] = "g++-11"
+
+
 
 # Check if we have numpy:
 try:
