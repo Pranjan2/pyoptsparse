@@ -69,8 +69,7 @@ class SLSQP(Optimizer):
         return informs
 
     def __call__(
-        self, optProb, sens=None, sensStep=None, sensMode=None, storeHistory=None, hotStart=None, storeSens=True
-    ):
+        self, optProb, sens=None, sensStep=None, sensMode=None, storeHistory=None, hotStart=None, storeSens=True, **kwargs):
         """
         This is the main routine used to solve the optimization
         problem.
@@ -120,6 +119,12 @@ class SLSQP(Optimizer):
             This is necessay for hot-starting only.
         """
 
+        if "p1" in kwargs:
+            print("Found SU2 project object for SLSQP")
+            self.project = kwargs["p1"]
+            print("Design space dimension for SLSQP :", self.project.n_dv)
+            Project = self.project
+
         self.callCounter = 0
         self.storeSens = storeSens
 
@@ -167,7 +172,7 @@ class SLSQP(Optimizer):
             # SLSQP - Objective/Constraint Values Function
             # =================================================================
             def slfunc(m, me, la, n, f, g, x):
-                fobj, fcon, fail = self._masterFunc(x, ["fobj", "fcon"])
+                fobj, fcon, fail = self._masterFunc(x, ["fobj", "fcon"], Project)
                 f = fobj
                 g[0:m] = -fcon
                 slsqp.pyflush(self.getOption("IOUT"))
@@ -177,9 +182,10 @@ class SLSQP(Optimizer):
             # SLSQP - Objective/Constraint Gradients Function
             # =================================================================
             def slgrad(m, me, la, n, f, g, df, dg, x):
-                gobj, gcon, fail = self._masterFunc(x, ["gobj", "gcon"])
+                gobj, gcon, fail = self._masterFunc(x, ["gobj", "gcon"], Project)
                 df[0:n] = gobj.copy()
                 dg[0:m, 0:n] = -gcon.copy()
+                print("Gnorm:", norm(df[0:n]))
                 slsqp.pyflush(self.getOption("IOUT"))
                 return df, dg
 
